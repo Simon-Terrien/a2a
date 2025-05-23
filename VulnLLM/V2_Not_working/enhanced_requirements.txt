@@ -1,0 +1,95 @@
+# Enhanced Multi-Agent Code Review System - Requirements
+
+# Core AI frameworks (optional - system works without these)
+python-a2a>=0.1.0
+fastmcp>=0.1.0
+langchain>=0.1.0
+langchain-openai>=0.1.0
+openai>=1.0.0
+
+# Enhanced system dependencies
+pyyaml>=6.0.0
+rich>=13.0.0
+click>=8.0.0
+flask>=2.3.0
+sqlalchemy>=2.0.0
+redis>=4.5.0
+
+# Logging and monitoring
+structlog>=23.1.0
+prometheus-client>=0.17.0
+
+# Code analysis tools
+bandit>=1.7.0
+pylint>=3.0.0
+flake8>=6.0.0
+black>=23.0.0
+mypy>=1.5.0
+safety>=2.3.0
+
+# Security and cryptography
+cryptography>=41.0.0
+bcrypt>=4.0.0
+
+# Utilities and data processing
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+pandas>=2.0.0
+numpy>=1.24.0
+jinja2>=3.1.0
+
+# Testing framework
+pytest>=7.4.0
+pytest-cov>=4.1.0
+pytest-asyncio>=0.21.0
+pytest-mock>=3.11.0
+
+# Development tools
+pre-commit>=3.3.0
+isort>=5.12.0
+autopep8>=2.0.0
+
+# Optional dependencies for advanced features
+# Uncomment if you want these features:
+
+# Advanced database support
+psycopg2-binary>=2.9.0  # PostgreSQL
+pymysql>=1.1.0          # MySQL
+
+# Advanced caching
+redis>=4.5.0            # Redis caching backend
+
+# Advanced monitoring
+sentry-sdk>=1.30.0      # Error tracking
+newrelic>=8.10.0        # APM monitoring
+
+# Async support
+aiohttp>=3.8.0          # Async HTTP client
+asyncio-mqtt>=0.11.0    # Async MQTT client
+
+# Machine learning extensions
+scikit-learn>=1.3.0     # ML algorithms
+torch>=2.0.0            # Deep learning
+transformers>=4.30.0    # Hugging Face models
+
+# Documentation
+sphinx>=7.1.0           # Documentation generation
+sphinx-rtd-theme>=1.3.0 # Read the Docs theme
+
+# Visualization
+matplotlib>=3.7.0       # Plotting
+plotly>=5.15.0          # Interactive plots
+
+# File format support
+openpyxl>=3.1.0         # Excel files
+python-docx>=0.8.11     # Word documents
+pypdf>=3.15.0           # PDF files
+
+# API and web framework extensions
+fastapi>=0.100.0        # Alternative to Flask
+uvicorn>=0.23.0         # ASGI server
+websockets>=11.0.0      # WebSocket support
+
+# Task queue and background jobs
+celery>=5.3.0           # Distributed task queue
+rq>=1.15.0              # Simple job queue

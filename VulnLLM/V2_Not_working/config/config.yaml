@@ -1,0 +1,28 @@
+agent:
+  max_tokens: 1500
+  model: gpt-4o
+  temperature: 0.1
+analysis:
+  analysis_timeout: 60
+  max_workers: 3
+  parallel_execution: true
+cache:
+  enabled: true
+  ttl: 3600
+  type: memory
+database:
+  enabled: true
+  type: sqlite
+  url: sqlite:///code_review.db
+logging:
+  file_enabled: true
+  file_path: logs/code_review.log
+  level: INFO
+mcp_server:
+  port_range_start: 7000
+performance_server:
+  port_range_start: 5100
+security_server:
+  port_range_start: 5000
+style_server:
+  port_range_start: 5200
