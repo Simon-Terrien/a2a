@@ -610,11 +610,11 @@ def process_file_parallel(args: tuple) -> Tuple[str, str, List[float], bool, Opt
             return functions
 
     except json.JSONDecodeError as e:
-            logger.exception(f"Invalid JSON in LLM response for {file_path}: {str(e)}")
+            logger.exception(f"Invalid JSON in LLM response for {args.input_path}: {str(e)}")
             return {}
 
     except Exception as e:
-        logger.exception(f"Error using LLM for function extraction in {file_path}: {str(e)}")
+        logger.exception(f"Error using LLM for function extraction in {args.input_path}: {str(e)}")
         return {}
 
 
