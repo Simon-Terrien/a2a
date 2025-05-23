@@ -10,15 +10,16 @@ from weasyprint.logger import LOGGER as weasyprint_logger
 from .config import KEYWORD_LISTS, MODEL_EMOJIS, VULNERABILITY_MAPPING
 
 # Initialize logger with module name
-logger = logging.getLogger('oasis')
+logger = logging.getLogger("oasis")
 
 # Suppress weasyprint warnings
-logging.getLogger('weasyprint').setLevel(logging.ERROR)
+logging.getLogger("weasyprint").setLevel(logging.ERROR)
+
 
 class EmojiFormatter(logging.Formatter):
     """
     Custom formatter that adds contextual emojis to log messages.
-    
+
     Handles:
     - Automatic emoji detection
     - Level-based icons
@@ -26,83 +27,88 @@ class EmojiFormatter(logging.Formatter):
     - Newline preservation
     """
 
-    @staticmethod  
-    def has_emoji_prefix(text: str) -> bool:  
-        emoji_ranges = [  
-            (0x1F300, 0x1F9FF),  # Misc Symbols & Pictographs  
-            (0x2600, 0x26FF),    # Misc Symbols  
-            (0x2700, 0x27BF),    # Dingbats  
-            (0x1F600, 0x1F64F),  # Emoticons  
-            (0x1F680, 0x1F6FF),  # Transport & Map Symbols  
-        ]  
-        if not text:  
-            return False  
-        first_char = text.strip()[0]  
-        code = ord(first_char)  
-        return any(start <= code <= end for start, end in emoji_ranges)  
+    @staticmethod
+    def has_emoji_prefix(text: str) -> bool:
+        emoji_ranges = [
+            (0x1F300, 0x1F9FF),  # Misc Symbols & Pictographs
+            (0x2600, 0x26FF),  # Misc Symbols
+            (0x2700, 0x27BF),  # Dingbats
+            (0x1F600, 0x1F64F),  # Emoticons
+            (0x1F680, 0x1F6FF),  # Transport & Map Symbols
+        ]
+        if not text:
+            return False
+        first_char = text.strip()[0]
+        code = ord(first_char)
+        return any(start <= code <= end for start, end in emoji_ranges)
 
-    def determine_icon(self, record) -> str:  
+    def determine_icon(self, record) -> str:
         # Early returns for non-string messages or messages with emoji prefixes
-        if not isinstance(record.msg, str) or self.has_emoji_prefix(record.msg.strip()):  
-            return ''
-            
+        if not isinstance(record.msg, str) or self.has_emoji_prefix(record.msg.strip()):
+            return ""
+
         msg_lower = record.msg.lower()
-        
+
         # Level-based icons
         if record.levelno == logging.DEBUG:
-            return '🪲  '
+            return "🪲  "
         if record.levelno == logging.WARNING:
-            return '⚠️  '
+            return "⚠️  "
         if record.levelno == logging.ERROR:
-            return '💥 ' if any(word in msg_lower for word in KEYWORD_LISTS['FAIL_WORDS']) else '❌ '
+            return (
+                "💥 "
+                if any(word in msg_lower for word in KEYWORD_LISTS["FAIL_WORDS"])
+                else "❌ "
+            )
         if record.levelno == logging.CRITICAL:
-            return '🚨 '
-            
+            return "🚨 "
+
         # INFO level processing - check for model names first
         if record.levelno == logging.INFO:
             # Check for model names first
             for model_name in MODEL_EMOJIS:
                 if model_name.lower() in msg_lower:
-                    return ''
-                    
+                    return ""
+
             # Map keyword categories to icons
             keyword_to_icon = {
-                'INSTALL_WORDS': '📥 ',
-                'START_WORDS': '🚀 ',
-                'FINISH_WORDS': '🏁 ',
-                'STOPPED_WORDS': '🛑 ',
-                'DELETE_WORDS': '🗑️ ',
-                'SUCCESS_WORDS': '✅ ',
-                'GENERATION_WORDS': '⚙️  ',
-                'REPORT_WORDS': '📄 ',
-                'MODEL_WORDS': '🤖 ',
-                'CACHE_WORDS': '💾 ',
-                'SAVE_WORDS': '💾 ',
-                'LOAD_WORDS': '📂 ',
-                'STATISTICS_WORDS': '📊 ',
-                'TOP_WORDS': '🏆 ',
-                'VULNERABILITY_WORDS': '🚨 ',
-                'ANALYSIS_WORDS': '🔎 ',
+                "INSTALL_WORDS": "📥 ",
+                "START_WORDS": "🚀 ",
+                "FINISH_WORDS": "🏁 ",
+                "STOPPED_WORDS": "🛑 ",
+                "DELETE_WORDS": "🗑️ ",
+                "SUCCESS_WORDS": "✅ ",
+                "GENERATION_WORDS": "⚙️  ",
+                "REPORT_WORDS": "📄 ",
+                "MODEL_WORDS": "🤖 ",
+                "CACHE_WORDS": "💾 ",
+                "SAVE_WORDS": "💾 ",
+                "LOAD_WORDS": "📂 ",
+                "STATISTICS_WORDS": "📊 ",
+                "TOP_WORDS": "🏆 ",
+                "VULNERABILITY_WORDS": "🚨 ",
+                "ANALYSIS_WORDS": "🔎 ",
             }
-            
+
             # Check each category and return the first matching icon
             for category, icon in keyword_to_icon.items():
                 if any(word in msg_lower for word in KEYWORD_LISTS[category]):
                     return icon
-                    
-        # Default: no icon
-        return ''
 
-    def format(self, record):  
-        if hasattr(record, 'emoji') and not record.emoji:  
-            return record.msg  
-        if not hasattr(record, 'formatted_message'):  
-            icon = self.determine_icon(record)  
-            if record.msg.startswith('\n'):  
-                record.formatted_message = record.msg.replace('\n', f'\n{icon}', 1)  
-            else:  
-                record.formatted_message = f"{icon}{record.msg}"  
+        # Default: no icon
+        return ""
+
+    def format(self, record):
+        if hasattr(record, "emoji") and not record.emoji:
+            return record.msg
+        if not hasattr(record, "formatted_message"):
+            icon = self.determine_icon(record)
+            if record.msg.startswith("\n"):
+                record.formatted_message = record.msg.replace("\n", f"\n{icon}", 1)
+            else:
+                record.formatted_message = f"{icon}{record.msg}"
         return record.formatted_message
+
 
 def setup_logging(debug=False, silent=False, error_log_file=None):
     """
@@ -135,7 +141,7 @@ def setup_logging(debug=False, silent=False, error_log_file=None):
     if silent and error_log_file:
         file_handler = logging.FileHandler(error_log_file)
         file_handler.setLevel(logging.ERROR)  # Only log errors and above
-        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+        formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
 
@@ -145,21 +151,22 @@ def setup_logging(debug=False, silent=False, error_log_file=None):
     if silent and not error_log_file:
         logger.setLevel(logging.CRITICAL + 1)  # Above all levels (complete silence)
     elif silent:
-        logger.setLevel(logging.ERROR)         # Only errors and above if logging to file
+        logger.setLevel(logging.ERROR)  # Only errors and above if logging to file
     elif debug:
-        logger.setLevel(logging.DEBUG)         # Show all messages
+        logger.setLevel(logging.DEBUG)  # Show all messages
     else:
-        logger.setLevel(logging.INFO)          # Show info, warning, error
+        logger.setLevel(logging.INFO)  # Show info, warning, error
 
     # Configure other loggers
-    fonttools_logger = logging.getLogger('fontTools')
+    fonttools_logger = logging.getLogger("fontTools")
     fonttools_logger.setLevel(logging.ERROR)
 
     weasyprint_logger.setLevel(logging.ERROR)
 
     # Disable other verbose loggers
-    logging.getLogger('PIL').setLevel(logging.WARNING)
-    logging.getLogger('markdown').setLevel(logging.WARNING)
+    logging.getLogger("PIL").setLevel(logging.WARNING)
+    logging.getLogger("markdown").setLevel(logging.WARNING)
+
 
 def chunk_content(content: str, max_length: int = 2048) -> List[str]:
     """
@@ -183,7 +190,7 @@ def chunk_content(content: str, max_length: int = 2048) -> List[str]:
         line_length = len(line) + 1  # +1 for newline
         if current_length + line_length > max_length:
             if current_chunk:
-                chunks.append('\n'.join(current_chunk))
+                chunks.append("\n".join(current_chunk))
             current_chunk = [line]
             current_length = line_length
         else:
@@ -191,42 +198,44 @@ def chunk_content(content: str, max_length: int = 2048) -> List[str]:
             current_length += line_length
 
     if current_chunk:
-        chunks.append('\n'.join(current_chunk))
+        chunks.append("\n".join(current_chunk))
 
     logger.debug(f"Split content of {len(content)} chars into {len(chunks)} chunks")
 
     return chunks
 
+
 def extract_clean_path(input_path: str | Path) -> Path:
     """
     Extract a clean path from input that might contain additional arguments
-    
+
     Args:
         input_path: Path string or Path object potentially containing additional arguments
-        
+
     Returns:
         Clean path in the same format as input (Path object or string)
     """
     # Determine input type to preserve it for output
     is_path_object = isinstance(input_path, Path)
-    
+
     # Convert to string for processing
     input_path_str = str(input_path)
-    
+
     # Extract the actual path before any arguments
     path_parts = input_path_str.split()
     actual_path = path_parts[0] if path_parts else input_path_str
-    
+
     # Handle quoted paths (remove quotes if present)
     if actual_path.startswith('"') and actual_path.endswith('"'):
         actual_path = actual_path[1:-1]
     elif actual_path.startswith("'") and actual_path.endswith("'"):
         actual_path = actual_path[1:-1]
-    
+
     logger.debug(f"Extracted clean path: {actual_path} from input: {input_path_str}")
-    
+
     # Return in the same format as input
     return Path(actual_path) if is_path_object else actual_path
+
 
 def parse_input(input_path: str | Path) -> List[Path]:
     """
@@ -240,23 +249,20 @@ def parse_input(input_path: str | Path) -> List[Path]:
     # Get clean path without arguments, and ensure it's a Path object
     clean_path_str = extract_clean_path(input_path)
     input_path = Path(clean_path_str)  # Convert to Path object for processing
-    
+
     files_to_analyze = []
 
     # Case 1: Input is a file containing paths
-    if input_path.suffix == '.txt':
+    if input_path.suffix == ".txt":
         try:
-            with open(input_path, 'r') as f:
+            with open(input_path, "r") as f:
                 paths = [line.strip() for line in f if line.strip()]
                 for path in paths:
                     p = Path(path)
                     if p.is_file():
                         files_to_analyze.append(p)
                     elif p.is_dir():
-                        files_to_analyze.extend(
-                            f for f in p.rglob('*') 
-                            if f.is_file()
-                        )
+                        files_to_analyze.extend(f for f in p.rglob("*") if f.is_file())
         except Exception as e:
             logger.exception(f"Error reading paths file: {str(e)}")
             return []
@@ -267,16 +273,14 @@ def parse_input(input_path: str | Path) -> List[Path]:
 
     # Case 3: Input is a directory
     elif input_path.is_dir():
-        files_to_analyze.extend(
-            f for f in input_path.rglob('*') 
-            if f.is_file()
-        )
+        files_to_analyze.extend(f for f in input_path.rglob("*") if f.is_file())
 
     else:
         logger.error(f"Invalid input path: {input_path}")
         return []
 
     return files_to_analyze
+
 
 def sanitize_name(string: str) -> str:
     """
@@ -286,8 +290,9 @@ def sanitize_name(string: str) -> str:
         string: Original string to be sanitized for file naming
     """
     # Get the last part after the last slash (if any)
-    base_name = string.split('/')[-1]
-    return re.sub(r'[^a-zA-Z0-9]', '_', base_name)
+    base_name = string.split("/")[-1]
+    return re.sub(r"[^a-zA-Z0-9]", "_", base_name)
+
 
 def display_logo():
     """
@@ -307,6 +312,7 @@ def display_logo():
 """
     logger.info(logo)
 
+
 def calculate_similarity(embedding1: List[float], embedding2: List[float]) -> float:
     """
     Calculate cosine similarity between two embeddings
@@ -320,16 +326,17 @@ def calculate_similarity(embedding1: List[float], embedding2: List[float]) -> fl
     # Convert to numpy arrays for efficient computation
     vec1 = np.array(embedding1)
     vec2 = np.array(embedding2)
-    
+
     # Calculate cosine similarity
     dot_product = np.dot(vec1, vec2)
     norm1 = np.linalg.norm(vec1)
     norm2 = np.linalg.norm(vec2)
-    
+
     if norm1 == 0 or norm2 == 0:
         return 0.0
-        
+
     return float(dot_product / (norm1 * norm2))
+
 
 def open_file(file_path: str) -> str:
     """
@@ -341,13 +348,13 @@ def open_file(file_path: str) -> str:
         Content of the file
     """
     # Try different encodings
-    encodings = ['utf-8', 'latin-1', 'cp1252', 'iso-8859-1']
+    encodings = ["utf-8", "latin-1", "cp1252", "iso-8859-1"]
     content = None
-    
+
     errors = []
     for encoding in encodings:
         try:
-            with open(file_path, 'r', encoding=encoding) as f:
+            with open(file_path, "r", encoding=encoding) as f:
                 content = f.read()
             break
         except UnicodeDecodeError:
@@ -358,13 +365,16 @@ def open_file(file_path: str) -> str:
             logger.exception(error_msg)
             errors.append(error_msg)
             continue
-    
+
     if content is None:
         error_details = "; ".join(errors)
-        logger.error(f"Failed to read {file_path}: Tried encodings {', '.join(encodings)}. Errors: {error_details}")
+        logger.error(
+            f"Failed to read {file_path}: Tried encodings {', '.join(encodings)}. Errors: {error_details}"
+        )
         return None
-    
+
     return content
+
 
 def get_vulnerability_mapping() -> Dict[str, Dict[str, any]]:
     """
@@ -375,6 +385,7 @@ def get_vulnerability_mapping() -> Dict[str, Dict[str, any]]:
     """
     return VULNERABILITY_MAPPING
 
+
 def generate_timestamp(for_file: bool = False) -> str:
     """
     Generate a timestamp in the format YYYY-MM-DD HH:MM:SS
@@ -384,6 +395,7 @@ def generate_timestamp(for_file: bool = False) -> str:
     else:
         return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+
 def parse_iso_date(date_string):
     """
     Parse ISO format date string with error handling
@@ -391,18 +403,19 @@ def parse_iso_date(date_string):
     """
     if not date_string:
         return None
-        
+
     try:
         # Handle 'Z' UTC indicator in ISO format
-        if date_string.endswith('Z'):
-            date_string = date_string.replace('Z', '+00:00')
-            
+        if date_string.endswith("Z"):
+            date_string = date_string.replace("Z", "+00:00")
+
         # Parse ISO format date string
         return datetime.fromisoformat(date_string)
     except (ValueError, TypeError) as e:
         print(f"Error parsing date '{date_string}': {e}")
         return None
-        
+
+
 def parse_report_date(date_string):
     """
     Parse report date string with error handling
@@ -410,18 +423,20 @@ def parse_report_date(date_string):
     """
     if not date_string:
         return None
-        
+
     try:
         # Parse date in format used by reports
-        dt = datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S')
+        dt = datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S")
         # Add UTC timezone if not present
         if dt.tzinfo is None:
             from datetime import timezone
+
             dt = dt.replace(tzinfo=timezone.utc)
         return dt
     except (ValueError, TypeError) as e:
         print(f"Error parsing report date '{date_string}': {e}")
         return None
+
 
 def create_cache_dir(input_path: str | Path) -> Path:
     """
@@ -429,9 +444,9 @@ def create_cache_dir(input_path: str | Path) -> Path:
     """
     # Create base cache directory
     input_path = Path(input_path).resolve()  # Get absolute path
-    base_cache_dir = input_path.parent / '.oasis_cache'
+    base_cache_dir = input_path.parent / ".oasis_cache"
     base_cache_dir.mkdir(exist_ok=True)
-    
+
     # Create project-specific cache directory using the final folder name
     project_name = sanitize_name(input_path.name)
     cache_dir = base_cache_dir / project_name
